@@ -5,26 +5,23 @@ const connectDB = require("./src/config/db");
 
 const DEFAULT_PORT = Number(process.env.PORT) || 5000;
 
-async function startServer(port) {
-  try {
-    await connectDB();
+function startServer(port) {
+  const server = app.listen(port, () => {
+    console.log(`✅ Server running on port ${port}`);
+  });
 
-    const server = app.listen(port, () => {
-      console.log(`✅ Server running on port ${port}`);
-    });
-
-    server.on("error", (error) => {
-      if (error.code === "EADDRINUSE") {
-        const nextPort = port + 1;
-        console.warn(`Port ${port} is busy. Trying ${nextPort} instead...`);
-        server.close(() => startServer(nextPort));
-      } else {
-        console.error("Server startup failed:", error);
-      }
-    });
-  } catch (err) {
-    console.error("Failed to start server:", err);
-  }
+  server.on("error", (error) => {
+    if (error.code === "EADDRINUSE") {
+      const nextPort = port + 1;
+      console.warn(`Port ${port} is busy. Trying ${nextPort} instead...`);
+      server.close(() => startServer(nextPort));
+    } else {
+      console.error("Server startup failed:", error);
+    }
+  });
 }
 
-startServer(DEFAULT_PORT);
+// Connect to database once, then start the server listening loop
+connectDB().then(() => {
+  startServer(DEFAULT_PORT);
+});
