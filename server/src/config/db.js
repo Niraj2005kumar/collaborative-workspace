@@ -1,30 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const dns = require("dns");
+
+// Set public DNS servers to resolve MongoDB SRV records on networks with misconfigured local DNS resolvers
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch (e) {
+  console.warn("Could not set custom DNS servers:", e.message);
+}
 
 const connectDB = async () => {
-  const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/collaborative_workspace';
+  console.log("DB Function Started");
+  console.log(process.env.MONGO_URI);
 
   try {
-    const conn = await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    console.log(`MongoDB connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
-    if (error.message.includes('querySrv') || error.message.includes('ECONNREFUSED')) {
-      console.warn('DNS SRV resolution failed. Retrying with Google/Cloudflare public DNS...');
-      try {
-        const dns = require('dns');
-        dns.setServers(['8.8.8.8', '1.1.1.1']);
-        const conn = await mongoose.connect(mongoUri, {
-          serverSelectionTimeoutMS: 5000,
-        });
-        console.log(`MongoDB connected: ${conn.connection.host} (via public DNS fallback)`);
-        return;
-      } catch (retryError) {
-        console.error('MongoDB connection failed after DNS fallback:', retryError.message);
-      }
-    }
-    console.warn('Continuing without MongoDB. Set MONGO_URI to a reachable MongoDB instance.');
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+
+    console.log("Mongo Connected:", conn.connection.host);
+  } catch (err) {
+    console.error("DB Error:");
+    console.error(err);
+    throw err;
   }
 };
 

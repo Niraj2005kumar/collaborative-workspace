@@ -1,8 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
-
-dotenv.config();
 
 const app = express();
 
@@ -11,9 +8,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.json({ message: "Collaborative Workspace API is running" });
+  res.status(200).json({
+    success: true,
+    message: "Collaborative Workspace API is running",
+  });
 });
 
 app.use("/api/users", require("./routes/userRoutes"));
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
 
 module.exports = app;
