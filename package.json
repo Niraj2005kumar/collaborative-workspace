@@ -22,8 +22,11 @@
   },
   "homepage": "https://github.com/Niraj2005kumar/collaborative-workspace#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.7.3"
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.3",
+    "validator": "^13.15.35"
   }
 }
