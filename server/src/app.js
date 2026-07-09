@@ -17,6 +17,8 @@ app.get("/", (req, res) => {
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/workspaces", require("./routes/workspaceRoutes"));
 
+app.use("/api/invites", require("./routes/inviteRoutes"));
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
