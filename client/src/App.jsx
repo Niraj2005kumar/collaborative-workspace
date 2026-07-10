@@ -1,13 +1,9 @@
-import './App.css'
-import { AuthProvider } from './context/AuthContext'
-import AppRoutes from './routes/AppRoutes'
+import React from "react";
+import AppRoutes from "./routes/AppRoutes";
+import "./App.css";
 
 function App() {
-  return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
-  )
+  return <AppRoutes />;
 }
 
-export default App
+export default App;
