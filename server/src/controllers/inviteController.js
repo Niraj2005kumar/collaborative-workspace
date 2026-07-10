@@ -39,22 +39,16 @@ exports.inviteUser = async (req, res) => {
       });
     }
 
-    if (workspace.members.includes(receiver._id)) {
-      return res.status(400).json({
-        success: false,
-        message: "User is already a member",
-      });
-    }
     if (
         workspace.members.some(
         member => member.toString() === receiver._id.toString()
         )
         ) {
-        return res.status(400).json({
-         success: false,
-         message: "User is already a member",
+            return res.status(400).json({
+                success: false,
+                message: "User is already a member",
             });
-    }
+        }
     const alreadyInvited = await Invite.findOne({
       receiver: receiver._id,
       workspace: workspace._id,
