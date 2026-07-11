@@ -464,3 +464,96 @@ button:hover {
     white-space: nowrap;
   }
 }
+
+.workspace-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.workspace-settings h1 {
+  font-size: 30px;
+  color: #1e293b;
+}
+
+.settings-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.settings-card h2 {
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.settings-card input,
+.settings-card textarea,
+.settings-card select {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+.settings-card textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.settings-card input:focus,
+.settings-card textarea:focus,
+.settings-card select:focus {
+  border-color: #0ea5e9;
+}
+
+.save-btn {
+  background: #0ea5e9;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.save-btn:hover {
+  background: #0284c7;
+}
+
+.remove-btn {
+  background: #f59e0b;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 8px;
+}
+
+.remove-btn:hover {
+  background: #d97706;
+}
+
+.danger-zone {
+  border: 2px solid #ef4444;
+}
+
+.danger-zone p {
+  margin: 15px 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}

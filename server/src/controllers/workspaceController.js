@@ -296,3 +296,64 @@ exports.leaveWorkspace = async (req, res) => {
     });
   }
 };
+
+exports.removeMember = async (req, res) => {
+  try {
+    const { workspaceId, memberId } = req.params;
+
+    const workspace = await Workspace.findById(workspaceId);
+
+    if (!workspace) {
+      return res.status(404).json({
+        success: false,
+        message: "Workspace not found",
+      });
+    }
+
+    // Only owner can remove members
+    if (workspace.owner.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Only workspace owner can remove members",
+      });
+    }
+
+    // Owner cannot remove themselves
+    if (workspace.owner.toString() === memberId) {
+      return res.status(400).json({
+        success: false,
+        message: "Workspace owner cannot be removed",
+      });
+    }
+
+    // Check member exists
+    if (!workspace.members.includes(memberId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found in workspace",
+      });
+    }
+
+    // Remove member from workspace
+    workspace.members.pull(memberId);
+    await workspace.save();
+
+    // Remove workspace from user's list
+    await User.findByIdAndUpdate(memberId, {
+      $pull: {
+        workspaces: workspace._id,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Member removed successfully",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

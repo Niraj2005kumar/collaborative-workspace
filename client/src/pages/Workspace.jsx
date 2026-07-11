@@ -1,18 +1,33 @@
-
+import { useNavigate } from "react-router-dom";
 
 const Workspace = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="workspace">
-
       <div className="workspace-header">
         <h1>Workspace</h1>
-        <button className="create-board-btn">
-          + Create Board
-        </button>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+          }}
+        >
+          <button className="create-board-btn">
+            + Create Board
+          </button>
+
+          <button
+            className="create-board-btn"
+            onClick={() => navigate("/workspace-settings")}
+          >
+            ⚙ Workspace Settings
+          </button>
+        </div>
       </div>
 
       <div className="workspace-info">
-
         <div className="workspace-card">
           <h2>Workspace Name</h2>
           <p>Collaborative Workspace</p>
@@ -30,15 +45,12 @@ const Workspace = () => {
           <h2>Visibility</h2>
           <p>Private</p>
         </div>
-
       </div>
 
       <div className="workspace-members">
-
         <h2>Members</h2>
 
         <table>
-
           <thead>
             <tr>
               <th>Name</th>
@@ -48,7 +60,6 @@ const Workspace = () => {
           </thead>
 
           <tbody>
-
             <tr>
               <td>Niraj Verma</td>
               <td>niraj@gmail.com</td>
@@ -66,19 +77,14 @@ const Workspace = () => {
               <td>rohit@gmail.com</td>
               <td>Member</td>
             </tr>
-
           </tbody>
-
         </table>
-
       </div>
 
       <div className="boards-section">
-
         <h2>Boards</h2>
 
         <div className="boards-grid">
-
           <div className="board-card">
             <h3>Frontend Board</h3>
             <p>React Development Tasks</p>
@@ -93,11 +99,8 @@ const Workspace = () => {
             <h3>Testing Board</h3>
             <p>Bug Tracking & QA</p>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 };

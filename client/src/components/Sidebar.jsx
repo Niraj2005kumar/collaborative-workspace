@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import {
   FaHome,
@@ -15,13 +14,18 @@ const Sidebar = () => {
   const menuItems = [
     {
       name: "Dashboard",
-      path: "/",
+      path: "/dashboard",
       icon: <FaHome />,
     },
     {
-      name: "Workspaces",
-      path: "/workspaces",
+      name: "Workspace",
+      path: "/workspace",
       icon: <FaFolderOpen />,
+    },
+    {
+      name: "Workspace Settings",
+      path: "/workspace-settings",
+      icon: <FaCog />,
     },
     {
       name: "Members",
@@ -32,11 +36,6 @@ const Sidebar = () => {
       name: "Invitations",
       path: "/invitations",
       icon: <FaEnvelope />,
-    },
-    {
-      name: "Settings",
-      path: "/settings",
-      icon: <FaCog />,
     },
   ];
 
