@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/userRoutes");
 const workspaceRoutes = require("./routes/workspaceRoutes");
 const inviteRoutes = require("./routes/inviteRoutes");
+const listRoutes = require("./routes/listRoutes");
 
 const app = express();
 
@@ -17,9 +18,13 @@ app.get("/", (req, res) => {
   });
 });
 
+
+
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/invites", inviteRoutes);
+app.use("/api/lists", listRoutes);
+
 
 app.use((req, res) => {
   res.status(404).json({
