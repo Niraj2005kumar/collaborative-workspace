@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -29,13 +32,14 @@ const Login = () => {
 
       const response = await loginUser(formData);
 
-      const token = response.data.token;
+      const { token, user } = response.data;
 
       if (!token) {
         throw new Error("Token not received");
       }
 
-      localStorage.setItem("token", token);
+      // Save token & user in AuthContext
+      login(token, user);
 
       alert("Login Successful");
 
