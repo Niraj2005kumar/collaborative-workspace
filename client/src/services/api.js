@@ -81,3 +81,55 @@ export const getWorkspaceMembers = (workspaceId) =>
   api.get(`/invites/${workspaceId}/members`);
 
 export default api;
+
+
+/* ==========================
+   Board APIs
+========================== */
+
+export const getBoards = (workspaceId) =>
+  api.get(`/boards/${workspaceId}`);
+
+export const createBoard = (data) =>
+  api.post("/boards", data);
+
+export const updateBoard = (id, data) =>
+  api.put(`/boards/${id}`, data);
+
+export const deleteBoard = (id) =>
+  api.delete(`/boards/${id}`);
+
+
+/* ==========================
+   List APIs
+========================== */
+
+export const getLists = (boardId) =>
+  api.get(`/lists/${boardId}`);
+
+export const createList = (data) =>
+  api.post("/lists", data);
+
+export const updateList = (id, data) =>
+  api.put(`/lists/${id}`, data);
+
+export const deleteList = (id) =>
+  api.delete(`/lists/${id}`);
+
+/* ==========================
+   Comment APIs
+========================== */
+
+export const getComments = (cardId) =>
+  api.get(`/comments/${cardId}`);
+
+export const createComment = (data) =>
+  api.post("/comments", data);
+
+export const updateComment = (id, data) =>
+  api.put(`/comments/${id}`, data);
+
+export const deleteComment = (id) =>
+  api.delete(`/comments/${id}`);
+
+

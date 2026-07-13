@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 
+
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -41,13 +42,12 @@ exports.register = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      data: {
+      user: {
         id: user._id,
         name: user.name,
         email: user.email,
       },
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -56,9 +56,11 @@ exports.register = async (req, res) => {
   }
 };
 
+
+
+
 exports.login = async (req, res) => {
   try {
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -108,21 +110,19 @@ exports.login = async (req, res) => {
         role: user.role,
       },
     });
-
   } catch (error) {
-
     res.status(500).json({
       success: false,
       message: error.message,
     });
-
   }
 };
 
+
+
+ 
 exports.getProfile = async (req, res) => {
-
   try {
-
     const user = await User.findById(req.user.id).select("-password");
 
     if (!user) {
@@ -134,16 +134,12 @@ exports.getProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: user,
+      user,
     });
-
   } catch (error) {
-
     res.status(500).json({
       success: false,
       message: error.message,
     });
-
   }
-
 };

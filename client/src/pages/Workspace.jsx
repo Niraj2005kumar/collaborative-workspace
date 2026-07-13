@@ -1,12 +1,49 @@
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getWorkspaces } from "../services/api";
 
 const Workspace = () => {
   const navigate = useNavigate();
 
+  const [workspace, setWorkspace] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchWorkspace = useCallback(async () => {
+    try {
+      const res = await getWorkspaces();
+      const workspaces = res.data.workspaces || [];
+
+      if (workspaces.length > 0) {
+        setWorkspace(workspaces[0]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWorkspace();
+  }, [fetchWorkspace]);
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
+  if (!workspace) {
+    return (
+      <div className="workspace">
+        <h2>No Workspace Found</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="workspace">
+
       <div className="workspace-header">
-        <h1>Workspace</h1>
+        <h1>{workspace.name}</h1>
 
         <div
           style={{
@@ -28,29 +65,30 @@ const Workspace = () => {
       </div>
 
       <div className="workspace-info">
+
         <div className="workspace-card">
           <h2>Workspace Name</h2>
-          <p>Collaborative Workspace</p>
+          <p>{workspace.name}</p>
         </div>
 
         <div className="workspace-card">
           <h2>Description</h2>
-          <p>
-            A collaborative platform for managing projects,
-            boards, tasks and team members.
-          </p>
+          <p>{workspace.description || "No description available."}</p>
         </div>
 
         <div className="workspace-card">
           <h2>Visibility</h2>
-          <p>Private</p>
+          <p>{workspace.visibility}</p>
         </div>
+
       </div>
 
       <div className="workspace-members">
+
         <h2>Members</h2>
 
         <table>
+
           <thead>
             <tr>
               <th>Name</th>
@@ -60,47 +98,43 @@ const Workspace = () => {
           </thead>
 
           <tbody>
-            <tr>
-              <td>Niraj Verma</td>
-              <td>niraj@gmail.com</td>
-              <td>Owner</td>
-            </tr>
 
-            <tr>
-              <td>Rahul Kumar</td>
-              <td>rahul@gmail.com</td>
-              <td>Member</td>
-            </tr>
+            {workspace.members.map((member) => (
+              <tr key={member._id}>
+                <td>{member.name}</td>
+                <td>{member.email}</td>
+                <td>
+                  {workspace.owner._id === member._id
+                    ? "Owner"
+                    : "Member"}
+                </td>
+              </tr>
+            ))}
 
-            <tr>
-              <td>Rohit Sharma</td>
-              <td>rohit@gmail.com</td>
-              <td>Member</td>
-            </tr>
           </tbody>
+
         </table>
+
       </div>
 
       <div className="boards-section">
+
         <h2>Boards</h2>
 
         <div className="boards-grid">
-          <div className="board-card">
-            <h3>Frontend Board</h3>
-            <p>React Development Tasks</p>
-          </div>
 
           <div className="board-card">
-            <h3>Backend Board</h3>
-            <p>Node.js API Development</p>
+            <h3>Boards will appear here</h3>
+            <p>
+              Create your first board to start managing
+              tasks.
+            </p>
           </div>
 
-          <div className="board-card">
-            <h3>Testing Board</h3>
-            <p>Bug Tracking & QA</p>
-          </div>
         </div>
+
       </div>
+
     </div>
   );
 };
