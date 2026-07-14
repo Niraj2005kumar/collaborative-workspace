@@ -14,15 +14,11 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Public Routes */}
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
 
         {/* Protected Routes */}
-
         <Route
           element={
             <ProtectedRoute>
@@ -50,7 +46,6 @@ const AppRoutes = () => {
             element={<WorkspaceSettings />}
           />
         </Route>
-
       </Routes>
     </BrowserRouter>
   );

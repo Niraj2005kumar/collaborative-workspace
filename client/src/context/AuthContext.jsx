@@ -1,4 +1,9 @@
-import { createContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 
 export const AuthContext = createContext(null);
 
@@ -22,6 +27,7 @@ export const AuthProvider = ({ children }) => {
       ...userData,
       token,
     });
+
     setLoading(false);
   };
 
@@ -29,6 +35,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
 
     setUser(null);
+
     setLoading(false);
   };
 
@@ -49,3 +56,11 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+/* ========= ADD THIS ========= */
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
+export default AuthContext;

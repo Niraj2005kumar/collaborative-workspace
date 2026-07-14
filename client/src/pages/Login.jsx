@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-
   const { login } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -32,13 +31,13 @@ const Login = () => {
 
       const response = await loginUser(formData);
 
-      const { token, user } = response.data;
+      const token = response.data?.token;
+      const user = response.data?.user || {};
 
       if (!token) {
         throw new Error("Token not received");
       }
 
-      // Save token & user in AuthContext
       login(token, user);
 
       alert("Login Successful");
@@ -58,13 +57,11 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-
         <h1>Collaborative Workspace</h1>
 
         <h2>Login</h2>
 
         <form onSubmit={handleSubmit}>
-
           <input
             type="email"
             name="email"
@@ -83,13 +80,9 @@ const Login = () => {
             required
           />
 
-          <button
-            type="submit"
-            disabled={loading}
-          >
+          <button type="submit" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
-
         </form>
 
         <p>
@@ -98,7 +91,6 @@ const Login = () => {
             Register
           </Link>
         </p>
-
       </div>
     </div>
   );
