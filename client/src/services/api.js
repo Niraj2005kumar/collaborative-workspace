@@ -60,9 +60,7 @@ export const inviteMember = (id, data) =>
   api.post(`/workspaces/${id}/invite`, data);
 
 export const removeMember = (workspaceId, memberId) =>
-  api.delete(
-    `/workspaces/${workspaceId}/members/${memberId}`
-  );
+  api.delete(`/workspaces/${workspaceId}/members/${memberId}`);
 
 /* ==========================
    Invitation APIs
@@ -80,9 +78,6 @@ export const rejectInvite = (inviteId) =>
 export const getWorkspaceMembers = (workspaceId) =>
   api.get(`/invites/${workspaceId}/members`);
 
-export default api;
-
-
 /* ==========================
    Board APIs
 ========================== */
@@ -98,7 +93,6 @@ export const updateBoard = (id, data) =>
 
 export const deleteBoard = (id) =>
   api.delete(`/boards/${id}`);
-
 
 /* ==========================
    List APIs
@@ -116,9 +110,22 @@ export const updateList = (id, data) =>
 export const deleteList = (id) =>
   api.delete(`/lists/${id}`);
 
-/* ==========================
-   Comment APIs
-========================== */
+
+
+export const getCards = (listId) =>
+  api.get(`/cards/${listId}`);
+
+export const createCard = (data) =>
+  api.post("/cards", data);
+
+export const updateCard = (id, data) =>
+  api.put(`/cards/${id}`, data);
+
+export const deleteCard = (id) =>
+  api.delete(`/cards/${id}`);
+
+
+
 
 export const getComments = (cardId) =>
   api.get(`/comments/${cardId}`);
@@ -132,4 +139,4 @@ export const updateComment = (id, data) =>
 export const deleteComment = (id) =>
   api.delete(`/comments/${id}`);
 
-
+export default api;
