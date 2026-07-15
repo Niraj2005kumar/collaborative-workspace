@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -21,9 +21,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/* ==========================
-   Authentication APIs
-========================== */
+
 
 export const registerUser = (data) =>
   api.post("/auth/register", data);

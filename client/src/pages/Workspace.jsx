@@ -15,6 +15,7 @@ const Workspace = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
+  // Fetch Boards
   const fetchBoards = async (workspaceId) => {
     try {
       const res = await getBoards(workspaceId);
@@ -24,9 +25,11 @@ const Workspace = () => {
     }
   };
 
+  // Fetch Workspace
   const fetchWorkspace = useCallback(async () => {
     try {
       const res = await getWorkspaces();
+
       const workspaces = res.data.workspaces || [];
 
       if (workspaces.length > 0) {
@@ -47,6 +50,7 @@ const Workspace = () => {
     fetchWorkspace();
   }, [fetchWorkspace]);
 
+  // Create Board
   const handleCreateBoard = async (title) => {
     try {
       await createBoard({
@@ -64,7 +68,7 @@ const Workspace = () => {
   };
 
   if (loading) {
-    return <h2>Loading...</h2>;
+    return <h2>Loading Workspace...</h2>;
   }
 
   if (!workspace) {
@@ -77,10 +81,15 @@ const Workspace = () => {
 
   return (
     <div className="workspace">
+
+      {/* Header */}
+
       <div className="workspace-header">
+
         <h1>{workspace.name}</h1>
 
         <div style={{ display: "flex", gap: "10px" }}>
+
           <button
             className="create-board-btn"
             onClick={() => setShowModal(true)}
@@ -90,14 +99,21 @@ const Workspace = () => {
 
           <button
             className="create-board-btn"
-            onClick={() => navigate("/workspace-settings")}
+            onClick={() =>
+              navigate("/workspace-settings")
+            }
           >
             ⚙ Workspace Settings
           </button>
+
         </div>
+
       </div>
 
+      {/* Workspace Info */}
+
       <div className="workspace-info">
+
         <div className="workspace-card">
           <h2>Workspace Name</h2>
           <p>{workspace.name}</p>
@@ -105,19 +121,27 @@ const Workspace = () => {
 
         <div className="workspace-card">
           <h2>Description</h2>
-          <p>{workspace.description || "No description available."}</p>
+          <p>
+            {workspace.description ||
+              "No description available"}
+          </p>
         </div>
 
         <div className="workspace-card">
           <h2>Visibility</h2>
           <p>{workspace.visibility}</p>
         </div>
+
       </div>
 
+      {/* Members */}
+
       <div className="workspace-members">
+
         <h2>Members</h2>
 
         <table>
+
           <thead>
             <tr>
               <th>Name</th>
@@ -127,6 +151,7 @@ const Workspace = () => {
           </thead>
 
           <tbody>
+
             {workspace.members?.map((member) => (
               <tr key={member._id}>
                 <td>{member.name}</td>
@@ -138,14 +163,21 @@ const Workspace = () => {
                 </td>
               </tr>
             ))}
+
           </tbody>
+
         </table>
+
       </div>
 
+      {/* Boards */}
+
       <div className="boards-section">
+
         <h2>Boards</h2>
 
         <div className="boards-grid">
+
           {boards.length === 0 ? (
             <div className="board-card">
               <h3>No Boards Available</h3>
@@ -153,20 +185,36 @@ const Workspace = () => {
             </div>
           ) : (
             boards.map((board) => (
-              <div className="board-card" key={board._id}>
+              <div
+                key={board._id}
+                className="board-card"
+                onClick={() =>
+                  navigate(`/board/${board._id}`)
+                }
+                style={{ cursor: "pointer" }}
+              >
                 <h3>{board.title}</h3>
-                <p>Board ID: {board._id}</p>
+
+                <p>
+                  Click to open this board
+                </p>
+
               </div>
             ))
           )}
+
         </div>
+
       </div>
+
+      {/* Create Board Modal */}
 
       <CreateBoardModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onCreate={handleCreateBoard}
       />
+
     </div>
   );
 };

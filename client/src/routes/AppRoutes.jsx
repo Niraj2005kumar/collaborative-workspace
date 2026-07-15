@@ -7,6 +7,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Workspace from "../pages/Workspace";
 import WorkspaceSettings from "../pages/WorkspaceSettings";
+import Board from "../pages/Board";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -14,6 +15,7 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -41,11 +43,24 @@ const AppRoutes = () => {
             element={<Workspace />}
           />
 
+          {/* Board Page */}
+          <Route
+            path="/board/:boardId"
+            element={<Board />}
+          />
+
           <Route
             path="/workspace-settings"
             element={<WorkspaceSettings />}
           />
         </Route>
+
+        {/* 404 Page */}
+        <Route
+          path="*"
+          element={<h2 style={{ textAlign: "center", marginTop: "50px" }}>404 - Page Not Found</h2>}
+        />
+
       </Routes>
     </BrowserRouter>
   );

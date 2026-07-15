@@ -147,3 +147,35 @@ exports.deleteCard = async (req, res) => {
     });
   }
 };
+
+
+
+// Update Card Positions (Drag & Drop)
+exports.updateCardPosition = async (req, res) => {
+  try {
+    const { cards } = req.body;
+
+    if (!cards || !Array.isArray(cards)) {
+      return res.status(400).json({
+        success: false,
+        message: "Cards data is required",
+      });
+    }
+
+    for (const card of cards) {
+      await Card.findByIdAndUpdate(card._id, {
+        position: card.position,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Card positions updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
