@@ -1,10 +1,9 @@
 const List = require("../models/List");
 const Board = require("../models/Board");
 
-
-
-
-
+// ==========================
+// Create List
+// ==========================
 exports.createList = async (req, res) => {
   try {
     const { title, board, position } = req.body;
@@ -28,7 +27,7 @@ exports.createList = async (req, res) => {
     const list = await List.create({
       title,
       board,
-      position,
+      position: position ?? 0,
     });
 
     res.status(201).json({
@@ -36,6 +35,7 @@ exports.createList = async (req, res) => {
       message: "List created successfully",
       list,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -44,7 +44,9 @@ exports.createList = async (req, res) => {
   }
 };
 
+// ==========================
 // Get All Lists of a Board
+// ==========================
 exports.getLists = async (req, res) => {
   try {
     const lists = await List.find({
@@ -58,6 +60,7 @@ exports.getLists = async (req, res) => {
       count: lists.length,
       lists,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -66,7 +69,9 @@ exports.getLists = async (req, res) => {
   }
 };
 
+// ==========================
 // Update List
+// ==========================
 exports.updateList = async (req, res) => {
   try {
     const { title, position } = req.body;
@@ -95,6 +100,7 @@ exports.updateList = async (req, res) => {
       message: "List updated successfully",
       list,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -103,7 +109,9 @@ exports.updateList = async (req, res) => {
   }
 };
 
+// ==========================
 // Delete List
+// ==========================
 exports.deleteList = async (req, res) => {
   try {
     const list = await List.findById(req.params.id);
@@ -121,6 +129,41 @@ exports.deleteList = async (req, res) => {
       success: true,
       message: "List deleted successfully",
     });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==========================
+// Update List Positions
+// (Drag & Drop)
+// ==========================
+exports.updateListPosition = async (req, res) => {
+  try {
+    const { lists } = req.body;
+
+    if (!lists || !Array.isArray(lists)) {
+      return res.status(400).json({
+        success: false,
+        message: "Lists data is required",
+      });
+    }
+
+    for (const list of lists) {
+      await List.findByIdAndUpdate(list._id, {
+        position: list.position,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "List positions updated successfully",
+    });
+
   } catch (error) {
     res.status(500).json({
       success: false,

@@ -7,7 +7,10 @@ const api = axios.create({
   },
 });
 
-// Automatically attach JWT token
+// ==========================
+// Attach JWT Token
+// ==========================
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -21,7 +24,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
+// ==========================
+// Authentication APIs
+// ==========================
 
 export const registerUser = (data) =>
   api.post("/auth/register", data);
@@ -32,9 +37,9 @@ export const loginUser = (data) =>
 export const getProfile = () =>
   api.get("/auth/profile");
 
-/* ==========================
-   Workspace APIs
-========================== */
+// ==========================
+// Workspace APIs
+// ==========================
 
 export const getWorkspaces = () =>
   api.get("/workspaces");
@@ -60,9 +65,9 @@ export const inviteMember = (id, data) =>
 export const removeMember = (workspaceId, memberId) =>
   api.delete(`/workspaces/${workspaceId}/members/${memberId}`);
 
-/* ==========================
-   Invitation APIs
-========================== */
+// ==========================
+// Invitation APIs
+// ==========================
 
 export const sendInvite = (workspaceId, data) =>
   api.post(`/invites/${workspaceId}`, data);
@@ -76,9 +81,9 @@ export const rejectInvite = (inviteId) =>
 export const getWorkspaceMembers = (workspaceId) =>
   api.get(`/invites/${workspaceId}/members`);
 
-/* ==========================
-   Board APIs
-========================== */
+// ==========================
+// Board APIs
+// ==========================
 
 export const getBoards = (workspaceId) =>
   api.get(`/boards/${workspaceId}`);
@@ -92,9 +97,9 @@ export const updateBoard = (id, data) =>
 export const deleteBoard = (id) =>
   api.delete(`/boards/${id}`);
 
-/* ==========================
-   List APIs
-========================== */
+// ==========================
+// List APIs
+// ==========================
 
 export const getLists = (boardId) =>
   api.get(`/lists/${boardId}`);
@@ -108,7 +113,9 @@ export const updateList = (id, data) =>
 export const deleteList = (id) =>
   api.delete(`/lists/${id}`);
 
-
+// ==========================
+// Card APIs
+// ==========================
 
 export const getCards = (listId) =>
   api.get(`/cards/${listId}`);
@@ -122,6 +129,11 @@ export const updateCard = (id, data) =>
 export const deleteCard = (id) =>
   api.delete(`/cards/${id}`);
 
+// ⭐ Drag & Drop Position Update
+export const updateCardPosition = (cards) =>
+  api.put("/cards/reorder", {
+    cards,
+  });
 
 
 
