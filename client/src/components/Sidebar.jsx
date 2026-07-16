@@ -1,11 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-
 import {
   FaHome,
   FaFolderOpen,
-  FaUsers,
-  FaEnvelope,
   FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
@@ -13,7 +10,6 @@ import {
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -37,37 +33,32 @@ const Sidebar = () => {
       path: "/workspace-settings",
       icon: <FaCog />,
     },
-    {
-      name: "Members",
-      path: "/members",
-      icon: <FaUsers />,
-    },
-    {
-      name: "Invitations",
-      path: "/invitations",
-      icon: <FaEnvelope />,
-    },
   ];
 
   return (
     <div className="sidebar">
-      <div className="sidebar-logo">
-        <h2>Collaborative Workspace</h2>
-      </div>
+      <div>
+        <div className="sidebar-logo">
+          <h2>Collaborative Hub</h2>
+        </div>
 
-      <ul className="sidebar-menu">
-        {menuItems.map((item) => (
-          <li
-            key={item.name}
-            className={location.pathname === item.path ? "active" : ""}
-          >
-            <Link to={item.path}>
-              <span className="icon">{item.icon}</span>
-              <span>{item.name}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+        <ul className="sidebar-menu">
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li
+                key={item.name}
+                className={isActive ? "active" : ""}
+              >
+                <Link to={item.path}>
+                  <span className="icon">{item.icon}</span>
+                  <span>{item.name}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       <div className="sidebar-footer">
         <button

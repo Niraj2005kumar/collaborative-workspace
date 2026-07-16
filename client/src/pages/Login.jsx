@@ -13,6 +13,7 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const { email, password } = formData;
 
@@ -25,6 +26,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
 
     try {
       setLoading(true);
@@ -40,11 +42,9 @@ const Login = () => {
 
       login(token, user);
 
-      alert("Login Successful");
-
       navigate("/dashboard");
     } catch (error) {
-      alert(
+      setErrorMsg(
         error.response?.data?.message ||
           error.message ||
           "Login Failed"
@@ -60,6 +60,22 @@ const Login = () => {
         <h1>Collaborative Workspace</h1>
 
         <h2>Login</h2>
+
+        {errorMsg && (
+          <div style={{
+            backgroundColor: "var(--danger-bg)",
+            color: "var(--danger)",
+            padding: "10px 14px",
+            borderRadius: "var(--radius-sm)",
+            fontSize: "14px",
+            marginBottom: "16px",
+            textAlign: "center",
+            fontWeight: "500",
+            border: "1px solid rgba(239, 68, 68, 0.2)"
+          }}>
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <input

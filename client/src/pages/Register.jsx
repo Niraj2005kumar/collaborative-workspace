@@ -12,6 +12,8 @@ const Register = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const { name, email, password } = formData;
 
@@ -24,6 +26,8 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
 
     try {
       setLoading(true);
@@ -31,12 +35,13 @@ const Register = () => {
       const response = await registerUser(formData);
 
       if (response.data.success) {
-        alert("Registration Successful");
-
-        navigate("/login");
+        setSuccessMsg("Registration Successful! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       }
     } catch (error) {
-      alert(
+      setErrorMsg(
         error.response?.data?.message ||
           error.message ||
           "Registration Failed"
@@ -53,6 +58,38 @@ const Register = () => {
         <h1>Collaborative Workspace</h1>
 
         <h2>Create Account</h2>
+
+        {errorMsg && (
+          <div style={{
+            backgroundColor: "var(--danger-bg)",
+            color: "var(--danger)",
+            padding: "10px 14px",
+            borderRadius: "var(--radius-sm)",
+            fontSize: "14px",
+            marginBottom: "16px",
+            textAlign: "center",
+            fontWeight: "500",
+            border: "1px solid rgba(239, 68, 68, 0.2)"
+          }}>
+            {errorMsg}
+          </div>
+        )}
+
+        {successMsg && (
+          <div style={{
+            backgroundColor: "var(--success-bg)",
+            color: "var(--success)",
+            padding: "10px 14px",
+            borderRadius: "var(--radius-sm)",
+            fontSize: "14px",
+            marginBottom: "16px",
+            textAlign: "center",
+            fontWeight: "500",
+            border: "1px solid rgba(16, 185, 129, 0.2)"
+          }}>
+            {successMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
 

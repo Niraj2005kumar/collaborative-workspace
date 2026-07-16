@@ -4,16 +4,26 @@ import {
   getWorkspaces,
   getBoards,
   createBoard,
+  createWorkspace,
 } from "../services/api";
 import CreateBoardModal from "../components/CreateBoardModal";
 
 const Workspace = () => {
   const navigate = useNavigate();
 
+  const [workspaces, setWorkspaces] = useState([]);
   const [workspace, setWorkspace] = useState(null);
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showBoardModal, setShowBoardModal] = useState(false);
+  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
+  
+  // New Workspace form state
+  const [newWorkspaceData, setNewWorkspaceData] = useState({
+    name: "",
+    description: "",
+    visibility: "private"
+  });
 
   // Fetch Boards
   const fetchBoards = async (workspaceId) => {
@@ -25,30 +35,53 @@ const Workspace = () => {
     }
   };
 
-  // Fetch Workspace
-  const fetchWorkspace = useCallback(async () => {
+  // Fetch Workspaces
+  const fetchAllWorkspaces = useCallback(async (selectWorkspaceId = null) => {
     try {
       const res = await getWorkspaces();
+      const workspacesList = res.data.workspaces || [];
+      setWorkspaces(workspacesList);
 
-      const workspaces = res.data.workspaces || [];
-
-      if (workspaces.length > 0) {
-        const currentWorkspace = workspaces[0];
-
+      if (workspacesList.length > 0) {
+        // If a specific workspace was selected/created, pick that. Otherwise default to first.
+        let currentWorkspace = workspacesList[0];
+        if (selectWorkspaceId) {
+          const found = workspacesList.find(w => w._id === selectWorkspaceId);
+          if (found) currentWorkspace = found;
+        }
+        
+        // Save selected workspace to state and session
         setWorkspace(currentWorkspace);
-
+        sessionStorage.setItem("selectedWorkspaceId", currentWorkspace._id);
         await fetchBoards(currentWorkspace._id);
+      } else {
+        setWorkspace(null);
+        setBoards([]);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error loading workspaces:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchWorkspace();
-  }, [fetchWorkspace]);
+    const savedId = sessionStorage.getItem("selectedWorkspaceId");
+    fetchAllWorkspaces(savedId);
+  }, [fetchAllWorkspaces]);
+
+  // Handle Workspace Switch
+  const handleWorkspaceChange = async (e) => {
+    const wsId = e.target.value;
+    const selected = workspaces.find(w => w._id === wsId);
+    if (selected) {
+      setWorkspace(selected);
+      sessionStorage.setItem("selectedWorkspaceId", selected._id);
+      setLoading(true);
+      await fetchBoards(selected._id);
+      setLoading(false);
+    }
+  };
 
   // Create Board
   const handleCreateBoard = async (title) => {
@@ -57,164 +90,300 @@ const Workspace = () => {
         title,
         workspace: workspace._id,
       });
-
       await fetchBoards(workspace._id);
-
-      setShowModal(false);
+      setShowBoardModal(false);
     } catch (error) {
       console.error(error);
       alert("Failed to create board");
     }
   };
 
-  if (loading) {
-    return <h2>Loading Workspace...</h2>;
-  }
+  // Create Workspace
+  const handleCreateWorkspaceSubmit = async (e) => {
+    e.preventDefault();
+    if (!newWorkspaceData.name.trim()) {
+      alert("Workspace name is required");
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await createWorkspace(newWorkspaceData);
+      const newWs = res.data.workspace;
+      
+      // Reset form
+      setNewWorkspaceData({ name: "", description: "", visibility: "private" });
+      setShowWorkspaceModal(false);
+      
+      // Refresh and select the newly created workspace
+      await fetchAllWorkspaces(newWs._id);
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Failed to create workspace");
+      setLoading(false);
+    }
+  };
 
-  if (!workspace) {
+  if (loading) {
     return (
-      <div className="workspace">
-        <h2>No Workspace Found</h2>
+      <div style={{ textAlign: "center", padding: "40px" }}>
+        <h2 style={{ color: "var(--text-muted)" }}>Loading Workspace...</h2>
       </div>
     );
   }
 
   return (
     <div className="workspace">
-
-      {/* Header */}
-
+      {/* Workspace Header / Selection */}
       <div className="workspace-header">
-
-        <h1>{workspace.name}</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {workspace ? (
+            <>
+              <h1>{workspace.name}</h1>
+              {workspaces.length > 1 && (
+                <select 
+                  value={workspace._id} 
+                  onChange={handleWorkspaceChange}
+                  style={{
+                    padding: "8px 12px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "var(--bg-card)",
+                    color: "var(--text-main)",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    outline: "none"
+                  }}
+                >
+                  {workspaces.map(w => (
+                    <option key={w._id} value={w._id}>{w.name}</option>
+                  ))}
+                </select>
+              )}
+            </>
+          ) : (
+            <h1>No Workspace Found</h1>
+          )}
+        </div>
 
         <div style={{ display: "flex", gap: "10px" }}>
-
           <button
             className="create-board-btn"
-            onClick={() => setShowModal(true)}
+            style={{ backgroundColor: "#10b981" }}
+            onClick={() => setShowWorkspaceModal(true)}
           >
-            + Create Board
+            + Create Workspace
           </button>
-
-          <button
-            className="create-board-btn"
-            onClick={() =>
-              navigate("/workspace-settings")
-            }
-          >
-            ⚙ Workspace Settings
-          </button>
-
-        </div>
-
-      </div>
-
-      {/* Workspace Info */}
-
-      <div className="workspace-info">
-
-        <div className="workspace-card">
-          <h2>Workspace Name</h2>
-          <p>{workspace.name}</p>
-        </div>
-
-        <div className="workspace-card">
-          <h2>Description</h2>
-          <p>
-            {workspace.description ||
-              "No description available"}
-          </p>
-        </div>
-
-        <div className="workspace-card">
-          <h2>Visibility</h2>
-          <p>{workspace.visibility}</p>
-        </div>
-
-      </div>
-
-      {/* Members */}
-
-      <div className="workspace-members">
-
-        <h2>Members</h2>
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {workspace.members?.map((member) => (
-              <tr key={member._id}>
-                <td>{member.name}</td>
-                <td>{member.email}</td>
-                <td>
-                  {workspace.owner?._id === member._id
-                    ? "Owner"
-                    : "Member"}
-                </td>
-              </tr>
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-      {/* Boards */}
-
-      <div className="boards-section">
-
-        <h2>Boards</h2>
-
-        <div className="boards-grid">
-
-          {boards.length === 0 ? (
-            <div className="board-card">
-              <h3>No Boards Available</h3>
-              <p>Create your first board.</p>
-            </div>
-          ) : (
-            boards.map((board) => (
-              <div
-                key={board._id}
-                className="board-card"
-                onClick={() =>
-                  navigate(`/board/${board._id}`)
-                }
-                style={{ cursor: "pointer" }}
+          
+          {workspace && (
+            <>
+              <button
+                className="create-board-btn"
+                onClick={() => setShowBoardModal(true)}
               >
-                <h3>{board.title}</h3>
+                + Create Board
+              </button>
 
-                <p>
-                  Click to open this board
-                </p>
-
-              </div>
-            ))
+              <button
+                className="create-board-btn"
+                style={{ 
+                  backgroundColor: "var(--bg-app)", 
+                  color: "var(--text-main)", 
+                  border: "1px solid var(--border-color)" 
+                }}
+                onClick={() => navigate("/workspace-settings")}
+              >
+                ⚙ Settings
+              </button>
+            </>
           )}
-
         </div>
-
       </div>
+
+      {!workspace ? (
+        <div style={{ 
+          textAlign: "center", 
+          padding: "80px 20px", 
+          backgroundColor: "var(--bg-card)", 
+          borderRadius: "var(--radius-md)",
+          border: "1px solid var(--border-color)"
+        }}>
+          <h2 style={{ marginBottom: "16px" }}>You are not in any workspace yet</h2>
+          <p style={{ color: "var(--text-muted)", marginBottom: "24px" }}>
+            Create a workspace to start managing your projects, boards, and tasks.
+          </p>
+          <button
+            className="create-board-btn"
+            style={{ padding: "12px 24px" }}
+            onClick={() => setShowWorkspaceModal(true)}
+          >
+            Create Your First Workspace
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Workspace Info */}
+          <div className="workspace-info">
+            <div className="workspace-card">
+              <h2>Workspace Name</h2>
+              <p>{workspace.name}</p>
+            </div>
+
+            <div className="workspace-card">
+              <h2>Description</h2>
+              <p>{workspace.description || "No description available"}</p>
+            </div>
+
+            <div className="workspace-card">
+              <h2>Visibility</h2>
+              <p style={{ textTransform: "capitalize" }}>{workspace.visibility}</p>
+            </div>
+          </div>
+
+          {/* Boards */}
+          <div className="boards-section">
+            <h2>Boards</h2>
+            <div className="boards-grid">
+              {boards.length === 0 ? (
+                <div 
+                  className="board-card" 
+                  style={{ 
+                    borderStyle: "dashed", 
+                    borderLeftWidth: "1px", 
+                    display: "flex", 
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "32px",
+                    cursor: "default"
+                  }}
+                >
+                  <h3 style={{ color: "var(--text-muted)" }}>No Boards Available</h3>
+                  <button 
+                    className="add-card-btn-inline"
+                    style={{ marginTop: "8px" }}
+                    onClick={() => setShowBoardModal(true)}
+                  >
+                    + Create a Board
+                  </button>
+                </div>
+              ) : (
+                boards.map((board) => (
+                  <div
+                    key={board._id}
+                    className="board-card"
+                    onClick={() => navigate(`/board/${board._id}`)}
+                  >
+                    <h3>{board.title}</h3>
+                    <p>Open Kanban Board</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Members */}
+          <div className="workspace-members">
+            <h2>Members</h2>
+            <div style={{ overflowX: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workspace.members?.map((member) => (
+                    <tr key={member._id}>
+                      <td style={{ fontWeight: "600" }}>{member.name}</td>
+                      <td>{member.email}</td>
+                      <td>
+                        <span className={`priority-badge ${workspace.owner?._id === member._id ? 'priority-high' : 'priority-low'}`}>
+                          {workspace.owner?._id === member._id ? "Owner" : "Member"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Create Board Modal */}
-
       <CreateBoardModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        isOpen={showBoardModal}
+        onClose={() => setShowBoardModal(false)}
         onCreate={handleCreateBoard}
       />
 
+      {/* Create Workspace Modal */}
+      {showWorkspaceModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Create Workspace</h2>
+            <form onSubmit={handleCreateWorkspaceSubmit}>
+              <label style={{ fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", display: "block", marginBottom: "4px" }}>
+                Workspace Name *
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Engineering Team"
+                value={newWorkspaceData.name}
+                onChange={(e) => setNewWorkspaceData(prev => ({ ...prev, name: e.target.value }))}
+                required
+              />
+
+              <label style={{ fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", display: "block", marginBottom: "4px" }}>
+                Description
+              </label>
+              <textarea
+                placeholder="What is this workspace about?"
+                value={newWorkspaceData.description}
+                onChange={(e) => setNewWorkspaceData(prev => ({ ...prev, description: e.target.value }))}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "var(--radius-sm)",
+                  backgroundColor: "var(--bg-app)",
+                  color: "var(--text-main)",
+                  fontSize: "14px",
+                  minHeight: "80px",
+                  marginBottom: "16px",
+                  outline: "none"
+                }}
+              />
+
+              <label style={{ fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", display: "block", marginBottom: "4px" }}>
+                Visibility
+              </label>
+              <select
+                value={newWorkspaceData.visibility}
+                onChange={(e) => setNewWorkspaceData(prev => ({ ...prev, visibility: e.target.value }))}
+              >
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+              </select>
+
+              <div className="modal-buttons">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowWorkspaceModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="create-btn">
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

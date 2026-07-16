@@ -1,16 +1,13 @@
-
-import {
-  FaBell,
-  FaSearch,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
+import { useAuth } from "../context/useAuth";
 
 const Navbar = () => {
+  const { user } = useAuth();
+
   return (
     <nav className="navbar">
-
       <div className="navbar-left">
-        <h2>Dashboard</h2>
+        <h2>Workspace Portal</h2>
       </div>
 
       <div className="navbar-center">
@@ -18,14 +15,13 @@ const Navbar = () => {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search workspace..."
+            placeholder="Search workspace tasks..."
           />
         </div>
       </div>
 
       <div className="navbar-right">
-
-        <button className="notification-btn">
+        <button className="notification-btn" title="Notifications">
           <FaBell />
         </button>
 
@@ -33,14 +29,14 @@ const Navbar = () => {
           <FaUserCircle className="profile-icon" />
           <div className="profile-info">
             <span className="profile-name">
-              Niraj Verma
+              {user?.name || "User Portal"}
             </span>
-            <small>Member</small>
+            <small style={{ textTransform: "capitalize" }}>
+              {user?.role || "Member"}
+            </small>
           </div>
         </div>
-
       </div>
-
     </nav>
   );
 };

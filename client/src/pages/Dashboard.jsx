@@ -1,25 +1,38 @@
 import { useCallback, useEffect, useState } from "react";
-import { getWorkspaces } from "../services/api";
+import { getWorkspaces, getBoards } from "../services/api";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [workspaces, setWorkspaces] = useState([]);
+  const [totalBoards, setTotalBoards] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const fetchWorkspaces = useCallback(async () => {
+  const fetchWorkspacesAndBoards = useCallback(async () => {
     try {
       const res = await getWorkspaces();
+      const workspacesList = res.data.workspaces || [];
+      setWorkspaces(workspacesList);
 
-      setWorkspaces(res.data.workspaces || []);
+      let boardsCount = 0;
+      for (const ws of workspacesList) {
+        try {
+          const boardsRes = await getBoards(ws._id);
+          boardsCount += (boardsRes.data.boards || []).length;
+        } catch (err) {
+          console.error("Failed to load boards for workspace:", ws._id, err);
+        }
+      }
+      setTotalBoards(boardsCount);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchWorkspaces();
-  }, [fetchWorkspaces]);
+    fetchWorkspacesAndBoards();
+  }, [fetchWorkspacesAndBoards]);
 
   const totalMembers = workspaces.reduce(
     (total, workspace) => total + (workspace.members?.length || 0),
@@ -48,7 +61,7 @@ const Dashboard = () => {
 
         <div className="card">
           <h3>Active Boards</h3>
-          <h2>0</h2>
+          <h2>{totalBoards}</h2>
         </div>
       </div>
 
@@ -56,34 +69,50 @@ const Dashboard = () => {
         <h2>Recent Workspaces</h2>
 
         {loading ? (
-          <p>Loading...</p>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>Loading workspaces...</p>
         ) : workspaces.length === 0 ? (
-          <p>No Workspaces Found</p>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>No workspaces found. Go to Workspaces page to create one.</p>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Workspace</th>
-                <th>Owner</th>
-                <th>Members</th>
-                <th>Visibility</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {workspaces.map((workspace) => (
-                <tr key={workspace._id}>
-                  <td>{workspace.name}</td>
-
-                  <td>{workspace.owner?.name}</td>
-
-                  <td>{workspace.members?.length}</td>
-
-                  <td>{workspace.visibility}</td>
+          <div style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Workspace Name</th>
+                  <th>Owner</th>
+                  <th>Members Count</th>
+                  <th>Visibility</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {workspaces.map((workspace) => (
+                  <tr key={workspace._id}>
+                    <td style={{ fontWeight: "600" }}>{workspace.name}</td>
+                    <td>{workspace.owner?.name || "Unknown"}</td>
+                    <td>{workspace.members?.length || 0} members</td>
+                    <td>
+                      <span className={`priority-badge ${workspace.visibility === 'public' ? 'priority-low' : 'priority-medium'}`}>
+                        {workspace.visibility}
+                      </span>
+                    </td>
+                    <td>
+                      <Link 
+                        to="/workspace" 
+                        style={{ 
+                          color: "var(--primary)", 
+                          fontWeight: "600",
+                          fontSize: "13px"
+                        }}
+                      >
+                        Open Workspace
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
