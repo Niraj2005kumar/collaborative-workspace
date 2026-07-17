@@ -7,10 +7,6 @@ const api = axios.create({
   },
 });
 
-// ==========================
-// Attach JWT Token
-// ==========================
-
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -24,10 +20,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ==========================
-// Authentication APIs
-// ==========================
-
 export const registerUser = (data) =>
   api.post("/auth/register", data);
 
@@ -36,10 +28,6 @@ export const loginUser = (data) =>
 
 export const getProfile = () =>
   api.get("/auth/profile");
-
-// ==========================
-// Workspace APIs
-// ==========================
 
 export const getWorkspaces = () =>
   api.get("/workspaces");
@@ -65,10 +53,6 @@ export const inviteMember = (id, data) =>
 export const removeMember = (workspaceId, memberId) =>
   api.delete(`/workspaces/${workspaceId}/members/${memberId}`);
 
-// ==========================
-// Invitation APIs
-// ==========================
-
 export const sendInvite = (workspaceId, data) =>
   api.post(`/invites/${workspaceId}`, data);
 
@@ -80,10 +64,6 @@ export const rejectInvite = (inviteId) =>
 
 export const getWorkspaceMembers = (workspaceId) =>
   api.get(`/invites/${workspaceId}/members`);
-
-// ==========================
-// Board APIs
-// ==========================
 
 export const getBoards = (workspaceId) =>
   api.get(`/boards/${workspaceId}`);
@@ -97,10 +77,6 @@ export const updateBoard = (id, data) =>
 export const deleteBoard = (id) =>
   api.delete(`/boards/${id}`);
 
-// ==========================
-// List APIs
-// ==========================
-
 export const getLists = (boardId) =>
   api.get(`/lists/${boardId}`);
 
@@ -112,10 +88,6 @@ export const updateList = (id, data) =>
 
 export const deleteList = (id) =>
   api.delete(`/lists/${id}`);
-
-// ==========================
-// Card APIs
-// ==========================
 
 export const getCards = (listId) =>
   api.get(`/cards/${listId}`);
@@ -129,13 +101,8 @@ export const updateCard = (id, data) =>
 export const deleteCard = (id) =>
   api.delete(`/cards/${id}`);
 
-// ⭐ Drag & Drop Position Update
 export const updateCardPosition = (cards) =>
-  api.put("/cards/reorder", {
-    cards,
-  });
-
-
+  api.put("/cards/reorder", { cards });
 
 export const getComments = (cardId) =>
   api.get(`/comments/${cardId}`);

@@ -69,9 +69,12 @@ const Dashboard = () => {
         <h2>Recent Workspaces</h2>
 
         {loading ? (
-          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>Loading workspaces...</p>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
+            Loading workspaces...</p>
         ) : workspaces.length === 0 ? (
-          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>No workspaces found. Go to Workspaces page to create one.</p>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
+            
+            No workspaces found. Go to Workspaces page to create one.</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table>
