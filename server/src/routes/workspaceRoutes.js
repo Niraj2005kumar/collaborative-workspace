@@ -1,38 +1,30 @@
 const express = require("express");
 
 const {
-  createWorkspace,
-  getWorkspaces,
-  getWorkspaceById,
-  updateWorkspace,
-  deleteWorkspace,
-  inviteMember,
-  leaveWorkspace,
-  removeMember,
-} = require("../controllers/workspaceController");
+  createProject,
+  getProjects,
+  getProjectById,
+  updateProject,
+  deleteProject,
+} = require("../controllers/projectController");
 
 const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/", auth, createWorkspace);
+// Create Project
+router.post("/", auth, createProject);
 
-router.get("/", auth, getWorkspaces);
+// Get All Projects of a Workspace
+router.get("/workspace/:workspaceId", auth, getProjects);
 
-router.get("/:id", auth, getWorkspaceById);
+// Get Single Project
+router.get("/:id", auth, getProjectById);
 
-router.put("/:id", auth, updateWorkspace);
+// Update Project
+router.put("/:id", auth, updateProject);
 
-router.delete("/:id", auth, deleteWorkspace);
-
-router.post("/:id/invite", auth, inviteMember);
-
-router.post("/:id/leave", auth, leaveWorkspace);
-
-router.delete(
-  "/:workspaceId/members/:memberId",
-  auth,
-  removeMember
-);
+// Delete Project
+router.delete("/:id", auth, deleteProject);
 
 module.exports = router;

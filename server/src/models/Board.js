@@ -1,19 +1,28 @@
 const mongoose = require("mongoose");
 
 const boardSchema = new mongoose.Schema(
-{
-    title:{
-        type:String,
-        required:true
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    workspace:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Workspace"
-    }
-},
-{
-    timestamps:true
-});
+    workspace: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workspace",
+      required: true,
+    },
 
-module.exports = mongoose.model("Board",boardSchema);
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = mongoose.model("Board", boardSchema);

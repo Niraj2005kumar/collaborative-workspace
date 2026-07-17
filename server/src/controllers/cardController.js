@@ -40,10 +40,19 @@ exports.createCard = async (req, res) => {
       position,
     });
 
+    const populatedCard = await Card.findById(card._id).populate(
+      "assignee",
+      "name email"
+    );
+
+    const io = req.app.get("io");
+
+    io.to(`list:${list}`).emit("cardCreated", populatedCard);
+
     res.status(201).json({
       success: true,
       message: "Card created successfully",
-      card,
+      card: populatedCard,
     });
   } catch (error) {
     res.status(500).json({
@@ -109,10 +118,19 @@ exports.updateCard = async (req, res) => {
 
     await card.save();
 
+    const updatedCard = await Card.findById(card._id).populate(
+      "assignee",
+      "name email"
+    );
+
+    const io = req.app.get("io");
+
+    io.to(`list:${updatedCard.list}`).emit("cardUpdated", updatedCard);
+
     res.status(200).json({
       success: true,
       message: "Card updated successfully",
-      card,
+      card: updatedCard,
     });
   } catch (error) {
     res.status(500).json({
@@ -134,7 +152,15 @@ exports.deleteCard = async (req, res) => {
       });
     }
 
+    const listId = card.list;
+
     await Card.findByIdAndDelete(req.params.id);
+
+    const io = req.app.get("io");
+
+    io.to(`list:${listId}`).emit("cardDeleted", {
+      cardId: req.params.id,
+    });
 
     res.status(200).json({
       success: true,
@@ -147,8 +173,6 @@ exports.deleteCard = async (req, res) => {
     });
   }
 };
-
-
 
 // Update Card Positions (Drag & Drop)
 exports.updateCardPosition = async (req, res) => {
@@ -167,6 +191,10 @@ exports.updateCardPosition = async (req, res) => {
         position: card.position,
       });
     }
+
+    const io = req.app.get("io");
+
+    io.emit("cardPositionsUpdated", cards);
 
     res.status(200).json({
       success: true,

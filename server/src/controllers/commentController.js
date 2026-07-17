@@ -1,8 +1,6 @@
 const Comment = require("../models/Comment");
 const Card = require("../models/Card");
 
-
-
 exports.createComment = async (req, res) => {
   try {
     const { card, message } = req.body;
@@ -33,6 +31,10 @@ exports.createComment = async (req, res) => {
       .populate("user", "name email")
       .populate("card", "title");
 
+    const io = req.app.get("io");
+
+    io.to(`card:${card}`).emit("commentCreated", populatedComment);
+
     res.status(201).json({
       success: true,
       message: "Comment added successfully",
@@ -45,7 +47,6 @@ exports.createComment = async (req, res) => {
     });
   }
 };
-
 
 exports.getComments = async (req, res) => {
   try {
@@ -67,7 +68,6 @@ exports.getComments = async (req, res) => {
     });
   }
 };
-
 
 exports.updateComment = async (req, res) => {
   try {
@@ -93,10 +93,21 @@ exports.updateComment = async (req, res) => {
 
     await comment.save();
 
+    const updatedComment = await Comment.findById(comment._id)
+      .populate("user", "name email")
+      .populate("card", "title");
+
+    const io = req.app.get("io");
+
+    io.to(`card:${updatedComment.card._id}`).emit(
+      "commentUpdated",
+      updatedComment
+    );
+
     res.status(200).json({
       success: true,
       message: "Comment updated successfully",
-      comment,
+      comment: updatedComment,
     });
   } catch (error) {
     res.status(500).json({
@@ -105,7 +116,6 @@ exports.updateComment = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteComment = async (req, res) => {
   try {
@@ -125,7 +135,15 @@ exports.deleteComment = async (req, res) => {
       });
     }
 
+    const cardId = comment.card;
+
     await Comment.findByIdAndDelete(req.params.id);
+
+    const io = req.app.get("io");
+
+    io.to(`card:${cardId}`).emit("commentDeleted", {
+      commentId: req.params.id,
+    });
 
     res.status(200).json({
       success: true,

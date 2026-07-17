@@ -310,7 +310,6 @@ exports.removeMember = async (req, res) => {
       });
     }
 
-    // Only owner can remove members
     if (workspace.owner.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
@@ -334,11 +333,11 @@ exports.removeMember = async (req, res) => {
       });
     }
 
-    // Remove member from workspace
+
     workspace.members.pull(memberId);
     await workspace.save();
 
-    // Remove workspace from user's list
+
     await User.findByIdAndUpdate(memberId, {
       $pull: {
         workspaces: workspace._id,

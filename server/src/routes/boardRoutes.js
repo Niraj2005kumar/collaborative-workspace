@@ -14,8 +14,8 @@ const router = express.Router();
 // Create Board
 router.post("/", auth, createBoard);
 
-// Get All Boards of a Workspace
-router.get("/:workspaceId", auth, getBoards);
+// Get All Boards of a Project
+router.get("/project/:projectId", auth, getBoards);
 
 // Update Board
 router.put("/:id", auth, updateBoard);

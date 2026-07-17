@@ -8,15 +8,22 @@ const boardRoutes = require("./routes/boardRoutes");
 const listRoutes = require("./routes/listRoutes");
 const cardRoutes = require("./routes/cardRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-// Home Route
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     success: true,
     message: "Collaborative Workspace API is running...",
   });
@@ -25,6 +32,7 @@ app.get("/", (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);
+app.use("/api/projects", projectRoutes);
 app.use("/api/invites", inviteRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/lists", listRoutes);

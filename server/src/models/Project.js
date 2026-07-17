@@ -1,16 +1,19 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Project name is required"],
       trim: true,
+      maxlength: 100,
     },
 
     description: {
       type: String,
+      trim: true,
       default: "",
+      maxlength: 500,
     },
 
     workspace: {
@@ -32,13 +35,6 @@ const projectSchema = new mongoose.Schema(
       },
     ],
 
-    boards: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Board",
-      },
-    ],
-
     status: {
       type: String,
       enum: ["Planning", "Active", "Completed", "Archived"],
@@ -47,7 +43,7 @@ const projectSchema = new mongoose.Schema(
 
     color: {
       type: String,
-      default: "#6366f1",
+      default: "#6366f1", // Indigo
     },
 
     isArchived: {
@@ -60,4 +56,6 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Project", projectSchema);
+const Project = mongoose.model("Project", projectSchema);
+
+export default Project;
