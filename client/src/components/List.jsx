@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { getCards, createCard, updateCard } from "../services/api";
+import { getSocket } from "../services/socket";
 import Card from "./Card";
 
-const List = ({ 
-  list, 
-  workspaceMembers, 
-  refreshTrigger, 
-  triggerRefresh, 
-  onRenameList, 
-  onDeleteList 
+const List = ({
+  list,
+  workspaceMembers,
+  refreshTrigger,
+  triggerRefresh,
+  onRenameList,
+  onDeleteList,
 }) => {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,7 @@ const List = ({
       const res = await getCards(list._id);
       setCards(res.data.cards || []);
     } catch (error) {
-      console.error("Error fetching cards for list:", list._id, error);
+      console.error("Error fetching cards:", error);
     } finally {
       setLoading(false);
     }
@@ -29,9 +30,62 @@ const List = ({
     fetchCards();
   }, [list._id, refreshTrigger]);
 
-  // Create Card
+  useEffect(() => {
+    const socket = getSocket();
+
+    if (!socket) return;
+
+    socket.emit("joinList", list._id);
+
+    const handleCardCreated = (card) => {
+      if (card.list === list._id) {
+        setCards((prev) => {
+          const exists = prev.some((c) => c._id === card._id);
+          if (exists) return prev;
+          return [...prev, card];
+        });
+      }
+    };
+
+    const handleCardUpdated = (updatedCard) => {
+      setCards((prev) =>
+        prev.map((card) =>
+          card._id === updatedCard._id ? updatedCard : card
+        )
+      );
+    };
+
+    const handleCardDeleted = ({ cardId }) => {
+      setCards((prev) =>
+        prev.filter((card) => card._id !== cardId)
+      );
+    };
+
+    const handleCardPositionsUpdated = () => {
+      fetchCards();
+    };
+
+    socket.on("cardCreated", handleCardCreated);
+    socket.on("cardUpdated", handleCardUpdated);
+    socket.on("cardDeleted", handleCardDeleted);
+    socket.on("cardPositionsUpdated", handleCardPositionsUpdated);
+
+    return () => {
+      socket.emit("leaveList", list._id);
+
+      socket.off("cardCreated", handleCardCreated);
+      socket.off("cardUpdated", handleCardUpdated);
+      socket.off("cardDeleted", handleCardDeleted);
+      socket.off(
+        "cardPositionsUpdated",
+        handleCardPositionsUpdated
+      );
+    };
+  }, [list._id]);
+
   const handleCreateCard = async () => {
     const title = prompt("Enter Task Title:");
+
     if (!title) return;
 
     try {
@@ -40,15 +94,12 @@ const List = ({
         list: list._id,
         position: cards.length,
       });
-      fetchCards();
-      triggerRefresh();
     } catch (error) {
-      console.error("Error creating card:", error);
+      console.error(error);
       alert("Failed to create task card");
     }
   };
 
-  // Drag and Drop handlers
   const handleDragOver = (e) => {
     e.preventDefault();
   };
@@ -65,24 +116,24 @@ const List = ({
   const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const cardId = e.dataTransfer.getData("cardId");
     const sourceListId = e.dataTransfer.getData("sourceListId");
-    
+
     if (!cardId || sourceListId === list._id) return;
 
     try {
-      // Update card on database
-      await updateCard(cardId, { list: list._id, position: cards.length });
-      // Trigger full board refresh to update list visuals in parallel
-      triggerRefresh();
+      await updateCard(cardId, {
+        list: list._id,
+        position: cards.length,
+      });
     } catch (err) {
       console.error("Failed to move card:", err);
     }
   };
 
   return (
-    <div 
+    <div
       className={`list-column ${isDragOver ? "drag-over" : ""}`}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
@@ -90,15 +141,27 @@ const List = ({
       onDrop={handleDrop}
     >
       <div className="list-header">
-        <h3 onClick={onRenameList} style={{ cursor: "pointer" }} title="Click to rename list">
+        <h3
+          onClick={onRenameList}
+          style={{ cursor: "pointer" }}
+          title="Click to rename list"
+        >
           {list.title}
         </h3>
 
         <div className="list-header-actions">
-          <button className="add-card-btn-inline" onClick={handleCreateCard}>
+          <button
+            className="add-card-btn-inline"
+            onClick={handleCreateCard}
+          >
             + Task
           </button>
-          <button className="list-delete-btn" onClick={onDeleteList} title="Delete list">
+
+          <button
+            className="list-delete-btn"
+            onClick={onDeleteList}
+            title="Delete list"
+          >
             🗑
           </button>
         </div>
@@ -106,7 +169,15 @@ const List = ({
 
       <div className="cards-container">
         {loading ? (
-          <p style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>Loading...</p>
+          <p
+            style={{
+              fontSize: "12px",
+              color: "var(--text-muted)",
+              textAlign: "center",
+            }}
+          >
+            Loading...
+          </p>
         ) : cards.length > 0 ? (
           cards.map((card) => (
             <Card
@@ -118,9 +189,7 @@ const List = ({
             />
           ))
         ) : (
-          <div className="empty-card">
-            No Cards Found
-          </div>
+          <div className="empty-card">No Cards Found</div>
         )}
       </div>
     </div>
