@@ -8,7 +8,11 @@ const boardRoutes = require("./routes/boardRoutes");
 const listRoutes = require("./routes/listRoutes");
 const cardRoutes = require("./routes/cardRoutes");
 const commentRoutes = require("./routes/commentRoutes");
-const projectRoutes = require("./routes/projectRoutes");
+const projectRoutes = require("./routes/projectRoutes").default || require("./routes/projectRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const searchRoutes = require("./routes/searchRoutes");
+const activityRoutes = require("./routes/activityRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 
@@ -38,6 +42,10 @@ app.use("/api/boards", boardRoutes);
 app.use("/api/lists", listRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/activities", activityRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // 404 Route
 app.use((req, res) => {

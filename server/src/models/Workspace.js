@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const projectSchema = new mongoose.Schema(
+const workspaceSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -11,12 +11,6 @@ const projectSchema = new mongoose.Schema(
     description: {
       type: String,
       default: "",
-    },
-
-    workspace: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Workspace",
-      required: true,
     },
 
     owner: {
@@ -32,27 +26,10 @@ const projectSchema = new mongoose.Schema(
       },
     ],
 
-    boards: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Board",
-      },
-    ],
-
-    status: {
+    visibility: {
       type: String,
-      enum: ["Planning", "Active", "Completed", "Archived"],
-      default: "Planning",
-    },
-
-    color: {
-      type: String,
-      default: "#6366f1",
-    },
-
-    isArchived: {
-      type: Boolean,
-      default: false,
+      enum: ["private", "public"],
+      default: "private",
     },
   },
   {
@@ -60,4 +37,4 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Project", projectSchema);
+module.exports = mongoose.model("Workspace", workspaceSchema);

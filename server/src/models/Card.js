@@ -38,6 +38,11 @@ const cardSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    labels: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

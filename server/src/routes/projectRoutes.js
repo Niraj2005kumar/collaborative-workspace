@@ -7,23 +7,23 @@ import {
   deleteProject,
 } from "../controllers/projectController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Create Project
-router.post("/", protect, createProject);
+router.post("/", auth, createProject);
 
 // Get All Projects of a Workspace
-router.get("/workspace/:workspaceId", protect, getProjects);
+router.get("/workspace/:workspaceId", auth, getProjects);
 
 // Get Single Project
-router.get("/:id", protect, getProjectById);
+router.get("/:id", auth, getProjectById);
 
 // Update Project
-router.put("/:id", protect, updateProject);
+router.put("/:id", auth, updateProject);
 
 // Delete Project
-router.delete("/:id", protect, deleteProject);
+router.delete("/:id", auth, deleteProject);
 
 export default router;

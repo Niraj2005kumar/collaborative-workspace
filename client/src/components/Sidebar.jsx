@@ -5,6 +5,8 @@ import {
   FaFolderOpen,
   FaCog,
   FaSignOutAlt,
+  FaHistory,
+  FaChartBar,
 } from "react-icons/fa";
 
 const Sidebar = () => {
@@ -29,9 +31,19 @@ const Sidebar = () => {
       icon: <FaFolderOpen />,
     },
     {
+      name: "Activity Log",
+      path: "/activity-log",
+      icon: <FaHistory />,
+    },
+    {
       name: "Workspace Settings",
       path: "/workspace-settings",
       icon: <FaCog />,
+    },
+    {
+      name: "Analytics",
+      path: "/analytics",
+      icon: <FaChartBar />,
     },
   ];
 

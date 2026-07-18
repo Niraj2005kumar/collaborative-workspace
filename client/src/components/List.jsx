@@ -86,11 +86,14 @@ const List = ({
   const handleCreateCard = async () => {
     const title = prompt("Enter Task Title:");
 
-    if (!title) return;
+    if (!title || !title.trim()) {
+      if (title !== null) alert("Task title cannot be empty.");
+      return;
+    }
 
     try {
       await createCard({
-        title,
+        title: title.trim(),
         list: list._id,
         position: cards.length,
       });
@@ -139,20 +142,62 @@ const List = ({
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "var(--bg-card)",
+        border: isDragOver ? "2px dashed var(--primary)" : "1px solid var(--border-color)",
+        borderRadius: "var(--radius-md)",
+        padding: "16px",
+        width: "300px",
+        minWidth: "300px",
+        maxHeight: "100%",
+        boxShadow: "var(--shadow-sm)",
+        transition: "border-color 0.2s ease, background-color 0.2s ease",
+      }}
     >
-      <div className="list-header">
+      <div 
+        className="list-header"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "16px",
+          paddingBottom: "8px",
+          borderBottom: "1px solid var(--border-color)"
+        }}
+      >
         <h3
           onClick={onRenameList}
-          style={{ cursor: "pointer" }}
+          style={{ 
+            cursor: "pointer",
+            fontSize: "14.5px",
+            fontWeight: "600",
+            color: "var(--text-main)",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "180px",
+          }}
           title="Click to rename list"
         >
           {list.title}
         </h3>
 
-        <div className="list-header-actions">
+        <div className="list-header-actions" style={{ display: "flex", gap: "6px" }}>
           <button
             className="add-card-btn-inline"
             onClick={handleCreateCard}
+            style={{
+              padding: "4px 8px",
+              fontSize: "12px",
+              fontWeight: "600",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "var(--primary-light)",
+              color: "var(--primary)",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
             + Task
           </button>
@@ -161,22 +206,41 @@ const List = ({
             className="list-delete-btn"
             onClick={onDeleteList}
             title="Delete list"
+            style={{
+              padding: "4px 8px",
+              fontSize: "12px",
+              borderRadius: "var(--radius-sm)",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
             🗑
           </button>
         </div>
       </div>
 
-      <div className="cards-container">
+      <div 
+        className="cards-container"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          overflowY: "auto",
+          flex: 1,
+          minHeight: "120px",
+          paddingRight: "4px",
+        }}
+      >
         {loading ? (
           <p
             style={{
               fontSize: "12px",
               color: "var(--text-muted)",
               textAlign: "center",
+              padding: "16px 0",
             }}
           >
-            Loading...
+            Loading tasks...
           </p>
         ) : cards.length > 0 ? (
           cards.map((card) => (
@@ -189,7 +253,20 @@ const List = ({
             />
           ))
         ) : (
-          <div className="empty-card">No Cards Found</div>
+          <div 
+            className="empty-card"
+            style={{
+              padding: "24px 16px",
+              textAlign: "center",
+              backgroundColor: "var(--bg-app)",
+              border: "1px dashed var(--border-color)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--text-muted)",
+              fontSize: "12px",
+            }}
+          >
+            No tasks in list
+          </div>
         )}
       </div>
     </div>

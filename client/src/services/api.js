@@ -20,27 +20,21 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const registerUser = (data) =>
-  api.post("/auth/register", data);
+// Auth APIs
+export const registerUser = (data) => api.post("/auth/register", data);
+export const loginUser = (data) => api.post("/auth/login", data);
+export const getProfile = () => api.get("/auth/profile");
+export const getDashboardStats = () => api.get("/dashboard/stats");
+export const searchEverything = (query) => api.get(`/search?q=${query}`);
+export const getActivities = (params) => api.get("/activities", { params });
+export const getAnalyticsTasks = (params) => api.get("/analytics/tasks", { params });
 
-export const loginUser = (data) =>
-  api.post("/auth/login", data);
-
-export const getProfile = () =>
-  api.get("/auth/profile");
-
-export const getWorkspaces = () =>
-  api.get("/workspaces");
-
-export const getWorkspaceById = (id) =>
-  api.get(`/workspaces/${id}`);
-
-export const createWorkspace = (data) =>
-  api.post("/workspaces", data);
-
+// Workspace APIs
+export const getWorkspaces = () => api.get("/workspaces");
+export const getWorkspaceById = (id) => api.get(`/workspaces/${id}`);
+export const createWorkspace = (data) => api.post("/workspaces", data);
 export const updateWorkspace = (id, data) =>
   api.put(`/workspaces/${id}`, data);
-
 export const deleteWorkspace = (id) =>
   api.delete(`/workspaces/${id}`);
 
@@ -65,8 +59,25 @@ export const rejectInvite = (inviteId) =>
 export const getWorkspaceMembers = (workspaceId) =>
   api.get(`/invites/${workspaceId}/members`);
 
-export const getBoards = (workspaceId) =>
-  api.get(`/boards/${workspaceId}`);
+// Project APIs
+export const getProjects = (workspaceId) =>
+  api.get(`/projects/workspace/${workspaceId}`);
+
+export const getProject = (projectId) =>
+  api.get(`/projects/${projectId}`);
+
+export const createProject = (data) =>
+  api.post("/projects", data);
+
+export const updateProject = (projectId, data) =>
+  api.put(`/projects/${projectId}`, data);
+
+export const deleteProject = (projectId) =>
+  api.delete(`/projects/${projectId}`);
+
+// Board APIs
+export const getBoards = (projectId) =>
+  api.get(`/boards/project/${projectId}`);
 
 export const createBoard = (data) =>
   api.post("/boards", data);
@@ -77,6 +88,7 @@ export const updateBoard = (id, data) =>
 export const deleteBoard = (id) =>
   api.delete(`/boards/${id}`);
 
+// List APIs
 export const getLists = (boardId) =>
   api.get(`/lists/${boardId}`);
 
@@ -89,6 +101,10 @@ export const updateList = (id, data) =>
 export const deleteList = (id) =>
   api.delete(`/lists/${id}`);
 
+export const updateListPosition = (lists) =>
+  api.put("/lists/reorder", { lists });
+
+// Card APIs
 export const getCards = (listId) =>
   api.get(`/cards/${listId}`);
 
@@ -104,6 +120,7 @@ export const deleteCard = (id) =>
 export const updateCardPosition = (cards) =>
   api.put("/cards/reorder", { cards });
 
+// Comment APIs
 export const getComments = (cardId) =>
   api.get(`/comments/${cardId}`);
 

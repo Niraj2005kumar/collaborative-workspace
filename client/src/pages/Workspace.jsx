@@ -1,37 +1,39 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CreateProjectModal from "../components/CreateProjectModal";
+import CreateBoardModal from "../components/CreateBoardModal";
 import {
   getWorkspaces,
-  getBoards,
-  createBoard,
+  getProjects,
   createWorkspace,
+  createProject,
 } from "../services/api";
-import CreateBoardModal from "../components/CreateBoardModal";
+
 
 const Workspace = () => {
   const navigate = useNavigate();
 
   const [workspaces, setWorkspaces] = useState([]);
   const [workspace, setWorkspace] = useState(null);
-  const [boards, setBoards] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showBoardModal, setShowBoardModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   
   // New Workspace form state
   const [newWorkspaceData, setNewWorkspaceData] = useState({
     name: "",
     description: "",
-    visibility: "private"
+    visibility: "private",
   });
 
   // Fetch Boards
-  const fetchBoards = async (workspaceId) => {
+  const fetchProjects = async (workspaceId) => {
     try {
-      const res = await getBoards(workspaceId);
-      setBoards(res.data.boards || []);
+      const res = await getProjects(workspaceId);
+      setProjects(res.data.projects || []);
     } catch (error) {
-      console.error("Error fetching boards:", error);
+      console.error("Error fetching projects:", error);
     }
   };
 
@@ -53,10 +55,10 @@ const Workspace = () => {
         // Save selected workspace to state and session
         setWorkspace(currentWorkspace);
         sessionStorage.setItem("selectedWorkspaceId", currentWorkspace._id);
-        await fetchBoards(currentWorkspace._id);
+        await fetchProjects(currentWorkspace._id);
       } else {
         setWorkspace(null);
-        setBoards([]);
+        setProjects([]);
       }
     } catch (error) {
       console.error("Error loading workspaces:", error);
@@ -73,28 +75,29 @@ const Workspace = () => {
   // Handle Workspace Switch
   const handleWorkspaceChange = async (e) => {
     const wsId = e.target.value;
-    const selected = workspaces.find(w => w._id === wsId);
+    const selected = workspaces.find((w) => w._id === wsId);
     if (selected) {
       setWorkspace(selected);
       sessionStorage.setItem("selectedWorkspaceId", selected._id);
       setLoading(true);
-      await fetchBoards(selected._id);
+      await fetchProjects(selected._id);
       setLoading(false);
     }
   };
 
-  // Create Board
-  const handleCreateBoard = async (title) => {
+  // Create Project
+  const handleCreateProject = async ({ name, description }) => {
     try {
-      await createBoard({
-        title,
+      await createProject({
+        name,
+        description,
         workspace: workspace._id,
       });
-      await fetchBoards(workspace._id);
-      setShowBoardModal(false);
+      await fetchProjects(workspace._id);
+      setShowProjectModal(false);
     } catch (error) {
       console.error(error);
-      alert("Failed to create board");
+      alert("Failed to create project");
     }
   };
 
@@ -178,9 +181,9 @@ const Workspace = () => {
             <>
               <button
                 className="create-board-btn"
-                onClick={() => setShowBoardModal(true)}
+                onClick={() => setShowProjectModal(true)}
               >
-                + Create Board
+                + Create Project
               </button>
 
               <button
@@ -239,17 +242,17 @@ const Workspace = () => {
             </div>
           </div>
 
-          {/* Boards */}
+          {/* Projects */}
           <div className="boards-section">
-            <h2>Boards</h2>
+            <h2>Projects</h2>
             <div className="boards-grid">
-              {boards.length === 0 ? (
-                <div 
-                  className="board-card" 
-                  style={{ 
-                    borderStyle: "dashed", 
-                    borderLeftWidth: "1px", 
-                    display: "flex", 
+              {projects.length === 0 ? (
+                <div
+                  className="board-card"
+                  style={{
+                    borderStyle: "dashed",
+                    borderLeftWidth: "1px",
+                    display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
@@ -257,24 +260,24 @@ const Workspace = () => {
                     cursor: "default"
                   }}
                 >
-                  <h3 style={{ color: "var(--text-muted)" }}>No Boards Available</h3>
-                  <button 
+                  <h3 style={{ color: "var(--text-muted)" }}>No Projects Available</h3>
+                  <button
                     className="add-card-btn-inline"
                     style={{ marginTop: "8px" }}
-                    onClick={() => setShowBoardModal(true)}
+                    onClick={() => setShowProjectModal(true)}
                   >
-                    + Create a Board
+                    + Create Project
                   </button>
                 </div>
               ) : (
-                boards.map((board) => (
+                projects.map((project) => (
                   <div
-                    key={board._id}
+                    key={project._id}
                     className="board-card"
-                    onClick={() => navigate(`/board/${board._id}`)}
+                    onClick={() => navigate(`/projects/${project._id}`)}
                   >
-                    <h3>{board.title}</h3>
-                    <p>Open Kanban Board</p>
+                    <h3>{project.name}</h3>
+                    <p>{project.description || "Open Project"}</p>
                   </div>
                 ))
               )}
@@ -312,11 +315,11 @@ const Workspace = () => {
         </>
       )}
 
-      {/* Create Board Modal */}
-      <CreateBoardModal
-        isOpen={showBoardModal}
-        onClose={() => setShowBoardModal(false)}
-        onCreate={handleCreateBoard}
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        isOpen={showProjectModal}
+        onClose={() => setShowProjectModal(false)}
+        onCreate={handleCreateProject}
       />
 
       {/* Create Workspace Modal */}

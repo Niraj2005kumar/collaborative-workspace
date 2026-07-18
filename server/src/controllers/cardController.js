@@ -1,5 +1,7 @@
 const Card = require("../models/Card");
 const List = require("../models/List");
+const Board = require("../models/Board");
+const logActivity = require("../utils/activityLogger");
 
 // Create Card
 exports.createCard = async (req, res) => {
@@ -12,6 +14,7 @@ exports.createCard = async (req, res) => {
       dueDate,
       list,
       position,
+      labels,
     } = req.body;
 
     if (!title || !list) {
@@ -38,12 +41,27 @@ exports.createCard = async (req, res) => {
       dueDate,
       list,
       position,
+      labels: labels || [],
     });
 
     const populatedCard = await Card.findById(card._id).populate(
       "assignee",
       "name email"
     );
+
+    const boardExists = await Board.findById(listExists.board);
+    if (boardExists) {
+      logActivity(
+        req.user.id,
+        "created",
+        "Card",
+        card._id,
+        card.title,
+        boardExists.workspace,
+        boardExists.project,
+        `Created task card "${card.title}"`
+      );
+    }
 
     const io = req.app.get("io");
 
@@ -97,6 +115,7 @@ exports.updateCard = async (req, res) => {
       dueDate,
       list,
       position,
+      labels,
     } = req.body;
 
     const card = await Card.findById(req.params.id);
@@ -110,11 +129,12 @@ exports.updateCard = async (req, res) => {
 
     if (title) card.title = title;
     if (description !== undefined) card.description = description;
-    if (assignee) card.assignee = assignee;
+    if (assignee !== undefined) card.assignee = assignee || null;
     if (priority) card.priority = priority;
-    if (dueDate) card.dueDate = dueDate;
+    if (dueDate !== undefined) card.dueDate = dueDate || null;
     if (list) card.list = list;
     if (position !== undefined) card.position = position;
+    if (labels !== undefined) card.labels = labels;
 
     await card.save();
 
@@ -122,6 +142,25 @@ exports.updateCard = async (req, res) => {
       "assignee",
       "name email"
     );
+
+    const listExists = await List.findById(updatedCard.list);
+    const boardExists = await Board.findById(listExists.board);
+    if (boardExists) {
+      const isMove = list && (list.toString() !== card.list.toString());
+      const actionDetails = isMove 
+        ? `Moved task to column "${listExists.title}"` 
+        : `Updated task details`;
+      logActivity(
+        req.user.id,
+        isMove ? "moved" : "updated",
+        "Card",
+        updatedCard._id,
+        updatedCard.title,
+        boardExists.workspace,
+        boardExists.project,
+        actionDetails
+      );
+    }
 
     const io = req.app.get("io");
 
