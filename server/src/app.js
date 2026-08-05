@@ -19,6 +19,7 @@ const app = express();
 const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.CLIENT_URL2,
+  "https://collaborative-workspace-mlex.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
 ].filter(Boolean);
