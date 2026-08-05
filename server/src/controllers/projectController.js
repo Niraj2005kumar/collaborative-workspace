@@ -1,8 +1,8 @@
-import Project from "../models/Project.js";
-import Workspace from "../models/Workspace.js";
+const Project = require("../models/Project");
+const Workspace = require("../models/Workspace");
 
 // Create Project
-export const createProject = async (req, res) => {
+exports.createProject = async (req, res) => {
   try {
     const { name, description, workspace, members, status, color } = req.body;
 
@@ -52,7 +52,7 @@ export const createProject = async (req, res) => {
 };
 
 // Get All Projects of Workspace
-export const getProjects = async (req, res) => {
+exports.getProjects = async (req, res) => {
   try {
     const { workspaceId } = req.params;
 
@@ -79,7 +79,7 @@ export const getProjects = async (req, res) => {
 };
 
 // Get Single Project
-export const getProjectById = async (req, res) => {
+exports.getProjectById = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id)
       .populate("owner", "name email")
@@ -107,7 +107,7 @@ export const getProjectById = async (req, res) => {
 };
 
 // Update Project
-export const updateProject = async (req, res) => {
+exports.updateProject = async (req, res) => {
   try {
     const { name, description, members, status, color } = req.body;
 
@@ -148,7 +148,7 @@ export const updateProject = async (req, res) => {
 };
 
 // Delete Project
-export const deleteProject = async (req, res) => {
+exports.deleteProject = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
 

@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5005";
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "https://collaborative-workspace-9ehw.onrender.com";
 
 let socket = null;
 
@@ -22,6 +22,8 @@ export const connectSocket = () => {
     },
   });
 
+
+  
   socket.on("connect", () => {
     console.log("🟢 Socket Connected:", socket.id);
   });

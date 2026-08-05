@@ -1,13 +1,13 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createProject,
   getProjects,
   getProjectById,
   updateProject,
   deleteProject,
-} from "../controllers/projectController.js";
+} = require("../controllers/projectController");
 
-import auth from "../middleware/auth.js";
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -26,4 +26,4 @@ router.put("/:id", auth, updateProject);
 // Delete Project
 router.delete("/:id", auth, deleteProject);
 
-export default router;
+module.exports = router;
