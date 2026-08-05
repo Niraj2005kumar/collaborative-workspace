@@ -1,12 +1,13 @@
 const Workspace = require("../models/Workspace");
-const Project = require("../models/Project");
+const ProjectModule = require("../models/Project");
+const Project = ProjectModule.default || ProjectModule;
 const Board = require("../models/Board");
 const List = require("../models/List");
 const Card = require("../models/Card");
 
 exports.getDashboardStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id || req.user.userId || req.user._id;
 
     // Find workspaces where user is member
     const workspaces = await Workspace.find({ members: userId });

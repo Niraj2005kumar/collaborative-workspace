@@ -21,7 +21,23 @@ function listenOnPort(port) {
 
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173",
+      origin: (origin, callback) => {
+        const allowedOrigins = [
+          process.env.CLIENT_URL,
+          process.env.CLIENT_URL2,
+          "http://localhost:5173",
+          "http://localhost:5174",
+        ].filter(Boolean);
+
+        const isLocalhost =
+          typeof origin === "string" && /^https?:\/\/localhost(:\d+)?$/.test(origin);
+
+        if (!origin || allowedOrigins.includes(origin) || isLocalhost) {
+          callback(null, true);
+        } else {
+          callback(new Error(`CORS policy does not allow access from origin ${origin}`));
+        }
+      },
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     },

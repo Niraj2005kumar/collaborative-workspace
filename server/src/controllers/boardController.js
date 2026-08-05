@@ -1,6 +1,7 @@
 const Board = require("../models/Board");
 const Workspace = require("../models/Workspace");
-const Project = require("../models/Project");
+const ProjectModule = require("../models/Project");
+const Project = ProjectModule.default || ProjectModule;
 
 // Create Board
 exports.createBoard = async (req, res) => {

@@ -1,5 +1,6 @@
 const Workspace = require("../models/Workspace");
-const Project = require("../models/Project");
+const ProjectModule = require("../models/Project");
+const Project = ProjectModule.default || ProjectModule;
 const Board = require("../models/Board");
 const List = require("../models/List");
 const Card = require("../models/Card");

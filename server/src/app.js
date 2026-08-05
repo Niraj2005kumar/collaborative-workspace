@@ -16,9 +16,25 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.CLIENT_URL2,
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(Boolean);
+
+const isLocalhostOrigin = (origin) =>
+  typeof origin === "string" && /^https?:\/\/localhost(:\d+)?$/.test(origin);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || isLocalhostOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy does not allow access from origin ${origin}`));
+      }
+    },
     credentials: true,
   })
 );

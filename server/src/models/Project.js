@@ -35,6 +35,13 @@ const projectSchema = new mongoose.Schema(
       },
     ],
 
+    boards: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Board",
+      },
+    ],
+
     status: {
       type: String,
       enum: ["Planning", "Active", "Completed", "Archived"],
